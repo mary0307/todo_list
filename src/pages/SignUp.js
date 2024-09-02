@@ -15,6 +15,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordConfirmationError, setPasswordConfirmationError] =
     useState('');
+  const [requestInProgress, setRequestInProgress] = useState(false);
 
   const [genericError, setGenericError] = useState('');
 
@@ -68,6 +69,8 @@ function SignUp() {
       return;
     }
 
+    setRequestInProgress(true);
+
     todoAPI
       .post('/users', {
         user: {
@@ -104,7 +107,7 @@ function SignUp() {
         }
       })
       .finally(() => {
-        console.log('end');
+        setRequestInProgress(false);
       });
   };
 
@@ -211,7 +214,7 @@ function SignUp() {
             )}
           </div>
 
-          <button type="submit" className="form-btn">
+          <button type="submit" className="form-btn" disabled={requestInProgress}>
             Sign up
           </button>
 
