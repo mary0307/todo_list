@@ -6,6 +6,6 @@ const todoAPI = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
-})
+});
 
 export { todoAPI };

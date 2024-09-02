@@ -71,9 +71,35 @@ function SignUp() {
           last_name: lastName
         }
       })
+      .then((resp) => {
+        console.log(resp);
+      })
       .catch((err) => {
-        console.error('Sign up request failed', err);
-        setGenericError('Unexpected error, please try again later');
+        console.error('Sign up request failed', err.response?.data);
+        if (!err.response?.data.errors) {
+          setGenericError('Unexpected error, please try again later');
+          return;
+        }
+
+        if (err.response.data.errors.email) {
+          setEmailError(err.response.data.errors.email.join(', '));
+        }
+
+        if (err.response.data.errors.name) {
+          setNameError(err.response.data.errors.name.join(', '));
+        }
+
+        if (err.response.data.errors.last_name) {
+          setLastNameError(err.response.data.errors.last_name.join(', '));
+        }
+
+        if (err.response.data.errors.password) {
+          setPasswordError(err.response.data.errors.password.join(', '));
+        }
+
+      })
+      .finally(() => {
+        console.log('end');
       });
   };
 
