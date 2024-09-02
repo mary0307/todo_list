@@ -13,8 +13,8 @@ function SignUp() {
   const [nameError, setNameError] = useState('');
   const [lastNameError, setLastNameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [passwordConfirmationError, setPasswordConfirmationError] = useState('');
-
+  const [passwordConfirmationError, setPasswordConfirmationError] =
+    useState('');
 
   const [genericError, setGenericError] = useState('');
 
@@ -52,12 +52,18 @@ function SignUp() {
       return;
     }
 
-    if (password !== confirmPassword ) {
+    if (password !== confirmPassword) {
       setPasswordConfirmationError('Passwords do not match');
       return;
     }
 
-    if (!email.length || !password.length || !name.length || !lastName.length || !confirmPassword.length) {
+    if (
+      !email.length ||
+      !password.length ||
+      !name.length ||
+      !lastName.length ||
+      !confirmPassword.length
+    ) {
       setGenericError('Pleas fill in all field');
       return;
     }
@@ -68,8 +74,8 @@ function SignUp() {
           email: email,
           password: password,
           name: name,
-          last_name: lastName
-        }
+          last_name: lastName,
+        },
       })
       .then((resp) => {
         console.log(resp);
@@ -96,7 +102,6 @@ function SignUp() {
         if (err.response.data.errors.password) {
           setPasswordError(err.response.data.errors.password.join(', '));
         }
-
       })
       .finally(() => {
         console.log('end');
@@ -106,79 +111,88 @@ function SignUp() {
   return (
     <div className="sign-up__page">
       <section className="sign-up">
-        <h2 className="sign-up-page-name">
-          Create account
-        </h2>
+        <h2 className="sign-up-page-name">Create account</h2>
         <form className="sign-up-form" onSubmit={handleSubmit}>
           <div className="form-field">
-            <label htmlFor="user-email" className="form-field-lable">Email</label>
-            <input type="email" id="user-email"
-                   className={`form-input ${emailError ? `border-red-500` : ''}`}
-                   required
-                   onChange={(evt) => {
-                     setEmailError('');
-                     setEmail(evt.target.value);
-                   }} />
-            {emailError &&
-              <div className="text-red-500">
-                { emailError }
-              </div>
-            }
+            <label htmlFor="user-email" className="form-field-lable">
+              Email
+            </label>
+            <input
+              type="email"
+              id="user-email"
+              className={`form-input ${emailError ? `border-red-500` : ''}`}
+              required
+              onChange={(evt) => {
+                setEmailError('');
+                setEmail(evt.target.value);
+              }}
+            />
+            {emailError && <div className="text-red-500">{emailError}</div>}
           </div>
 
           <div className="form-field">
-            <label htmlFor="user-name" className="form-field-lable">Name</label>
-            <input type="text" id="user-name"
-                   className={`form-input ${nameError ? `border-red-500` : ''}`}
-                   required
-                   onChange={(evt) => {
-                     setNameError('');
-                     setName(evt.target.value)
-                   }} />
-            {nameError &&
-              <div className="text-red-500">
-                { nameError }
-              </div>
-            }
+            <label htmlFor="user-name" className="form-field-lable">
+              Name
+            </label>
+            <input
+              type="text"
+              id="user-name"
+              className={`form-input ${nameError ? `border-red-500` : ''}`}
+              required
+              onChange={(evt) => {
+                setNameError('');
+                setName(evt.target.value);
+              }}
+            />
+            {nameError && <div className="text-red-500">{nameError}</div>}
           </div>
 
           <div className="form-field">
-            <label htmlFor="user-last-name" className="form-field-lable">Surname</label>
-            <input type="text" id="user-last-name"
-                   className={`form-input ${lastNameError ? `border-red-500` : ''}`}
-                   required
-                   onChange={(evt) => {
-                     setLastNameError('');
-                     setLastName(evt.target.value)
-                   }} />
-            {lastNameError &&
-              <div className="text-red-500">
-                { lastNameError }
-              </div>
-            }
+            <label htmlFor="user-last-name" className="form-field-lable">
+              Surname
+            </label>
+            <input
+              type="text"
+              id="user-last-name"
+              className={`form-input ${lastNameError ? `border-red-500` : ''}`}
+              required
+              onChange={(evt) => {
+                setLastNameError('');
+                setLastName(evt.target.value);
+              }}
+            />
+            {lastNameError && (
+              <div className="text-red-500">{lastNameError}</div>
+            )}
           </div>
 
           <div className="form-field">
-            <label htmlFor="user-password" className="form-field-lable">Password</label>
-            <input type="password" minLength="6" id="user-password"
-                   className={`form-input ${passwordError ? `border-red-500` : ''}`}
-                   required
-                   onChange={(evt) => {
-                     setPasswordError('');
-                     setPassword(evt.target.value)
-                     if (evt.target.value === confirmPassword) {
-                       setPasswordConfirmationError('');
-                     }
-                   }} />
-            {passwordError &&
-              <div className="text-red-500">
-                { passwordError }
-              </div>
-            }
+            <label htmlFor="user-password" className="form-field-lable">
+              Password
+            </label>
+            <input
+              type="password"
+              minLength="6"
+              id="user-password"
+              className={`form-input ${passwordError ? `border-red-500` : ''}`}
+              required
+              onChange={(evt) => {
+                setPasswordError('');
+                setPassword(evt.target.value);
+                if (evt.target.value === confirmPassword) {
+                  setPasswordConfirmationError('');
+                }
+              }}
+            />
+            {passwordError && (
+              <div className="text-red-500">{passwordError}</div>
+            )}
           </div>
 
           <div className="form-field">
-            <label htmlFor="user-confirm-password" className="form-field-lable">Confirm password</label>
+            <label htmlFor="user-confirm-password" className="form-field-lable">
+              Confirm password
+            </label>
             <input
               type="password"
               minLength="6"
@@ -190,23 +204,20 @@ function SignUp() {
                 if (evt.target.value === password) {
                   setPasswordConfirmationError('');
                 }
-              }} />
-            {passwordConfirmationError &&
-              <div className="text-red-500">
-                { passwordConfirmationError }
-              </div>
-            }
+              }}
+            />
+            {passwordConfirmationError && (
+              <div className="text-red-500">{passwordConfirmationError}</div>
+            )}
           </div>
 
           <button type="submit" className="form-btn">
             Sign up
           </button>
 
-          {genericError &&
-            <div className="text-red-500 mt-2">
-              { genericError }
-            </div>
-          }
+          {genericError && (
+            <div className="mt-2 text-red-500">{genericError}</div>
+          )}
         </form>
       </section>
     </div>
