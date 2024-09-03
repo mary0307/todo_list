@@ -1,10 +1,23 @@
 import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+import './App.css';
+import Home from './pages/Home';
 import SignUp from './pages/SignUp';
-import './App.css'; // Keep it the last import for css ordering
 
 function App() {
-  return <SignUp></SignUp>;
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Home />,
+    },
+    {
+      path: '/signup',
+      element: <SignUp />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
 export default App;

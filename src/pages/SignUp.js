@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import './SignUp.css';
 import { todoAPI } from '../api/todoAPI';
@@ -82,6 +83,7 @@ function SignUp() {
       })
       .then((resp) => {
         console.log(resp);
+        window.location.href = '/';
       })
       .catch((err) => {
         console.error('Sign up request failed', err.response?.data);
