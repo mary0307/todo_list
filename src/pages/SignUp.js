@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import './SignUp.css';
 import { todoAPI } from '../api/todoAPI';
+import UserContext from '../contexts/UserContext';
 
 function SignUp() {
+  const { setUser } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -83,7 +88,9 @@ function SignUp() {
       })
       .then((resp) => {
         console.log(resp);
-        window.location.href = '/';
+        setUser(resp.data);
+        navigate('/');
+        // window.location.href = '/';
       })
       .catch((err) => {
         console.error('Sign up request failed', err.response?.data);
