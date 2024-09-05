@@ -5,11 +5,7 @@ import UserContext from '../contexts/UserContext';
 function Home() {
   const { user } = useContext(UserContext);
 
-  return(
-    <>
-      { user?.name }
-    </>
-  );
+  return <>{user?.name}</>;
 }
 
 export default Home;

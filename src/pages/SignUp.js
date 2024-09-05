@@ -87,10 +87,9 @@ function SignUp() {
         },
       })
       .then((resp) => {
-        console.log(resp);
+        localStorage.setItem('authorization', `${resp.headers.authorization}`);
         setUser(resp.data);
         navigate('/');
-        // window.location.href = '/';
       })
       .catch((err) => {
         console.error('Sign up request failed', err.response?.data);
@@ -223,7 +222,11 @@ function SignUp() {
             )}
           </div>
 
-          <button type="submit" className="form-btn" disabled={requestInProgress}>
+          <button
+            type="submit"
+            className="form-btn"
+            disabled={requestInProgress}
+          >
             Sign up
           </button>
 
