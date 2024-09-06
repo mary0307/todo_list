@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './App.css';
 import Home from './pages/Home';
 import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
 import UserContext from './contexts/UserContext';
 import { todoAPI } from './api/todoAPI';
 
@@ -18,6 +19,10 @@ function App() {
       path: '/signup',
       element: <SignUp />,
     },
+    {
+      path: '/signin',
+      element: <SignIn />,
+    },
   ]);
 
   useEffect(() => {
@@ -28,6 +33,10 @@ function App() {
     if (!localStorage.getItem('authorization')) {
       window.location.href = '/signup';
     } else {
+      if (window.location.pathname === '/signup') {
+        return;
+      }
+
       todoAPI
         .get('/me', {
           headers: {
@@ -38,6 +47,10 @@ function App() {
           setUser(resp.data);
         })
         .catch((err) => {
+          if (window.location.pathname === '/signin') {
+            return;
+          }
+
           console.error(err);
           alert('Reload the page');
         });
