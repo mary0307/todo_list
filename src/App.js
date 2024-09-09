@@ -30,13 +30,13 @@ function App() {
       return;
     }
 
+    if (['/signup', '/signin'].includes(window.location.pathname)) {
+      return;
+    }
+
     if (!localStorage.getItem('authorization')) {
       window.location.href = '/signup';
     } else {
-      if (window.location.pathname === '/signup') {
-        return;
-      }
-
       todoAPI
         .get('/me', {
           headers: {

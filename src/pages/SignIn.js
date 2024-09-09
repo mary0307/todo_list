@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import './SignIn.css';
 import { todoAPI } from '../api/todoAPI';
 import UserContext from '../contexts/UserContext';
 
@@ -13,7 +12,11 @@ function SignIn() {
   const [requestInProgress, setRequestInProgress] = useState(false);
   const [genericError, setGenericError] = useState('');
 
-  const handleSubmit = (evt) => {
+  const { setUser } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (evt) => {
     evt.preventDefault();
 
     setGenericError('');
@@ -39,52 +42,45 @@ function SignIn() {
 
     setRequestInProgress(true);
 
-    // todoAPI
-    //   .post('/users', {
-    //     user: {
-    //       email: email,
-    //       password: password
-    //     },
-    //   })
-    //   .then((resp) => {
-    //     localStorage.setItem('authorization', `${resp.headers.authorization}`);
-    //     setUser(resp.data);
-    //     navigate('/');
-    //   })
-    //   .catch((err) => {
-    //     console.error('Sign up request failed', err.response?.data);
-    //     if (!err.response?.data.errors) {
-    //       setGenericError('Unexpected error, please try again later');
-    //       return;
-    //     }
-    //
-    //     if (err.response.data.errors.email) {
-    //       setEmailError(err.response.data.errors.email.join(', '));
-    //     }
-    //
-    //     if (err.response.data.errors.password) {
-    //       setPasswordError(err.response.data.errors.password.join(', '));
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setRequestInProgress(false);
-    //   });
+    try {
+      const resp = await todoAPI.post('/users/sign_in', {
+        user: {
+          email: email,
+          password: password,
+        },
+      });
+      localStorage.setItem('authorization', `${resp.headers.authorization}`);
+      setUser(resp.data);
+      navigate('/');
+    } catch (error) {
+      console.error(error.response?.data?.error);
+      if (error.response?.data?.error) {
+        setGenericError(error.response?.data?.error);
+      } else {
+        setGenericError('Unexpected error, please try again later');
+      }
+    }
+
+    setRequestInProgress(false);
   };
 
   return (
-    <div className="sign-in__page">
-      <section className="sign-in">
-        <h2 className="sign-in-page-name">Sign In</h2>
-        <form className="sign-in-form" onSubmit={handleSubmit}>
-          <div className="form-field">
+    <div className="m-auto h-96 w-80">
+      <section className="box-border flex w-full flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold">Sign In</h2>
+        <form
+          className="box-border rounded-2xl border-2 border-solid border-blue-900 pb-4 pl-16 pr-16 pt-8 text-center"
+          onSubmit={handleSubmit}
+        >
+          <div className="mb-4">
             <label htmlFor="user-email" className="form-field-lable">
               Email
             </label>
             <input
               type="email"
               id="user-email"
-              className={`form-input ${emailError ? `border-red-500` : ''}`}
-              // required
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${emailError ? `border-red-500` : ''}`}
+              required
               onChange={(evt) => {
                 setEmailError('');
                 setEmail(evt.target.value);
@@ -93,7 +89,7 @@ function SignIn() {
             {emailError && <div className="text-red-500">{emailError}</div>}
           </div>
 
-          <div className="form-field">
+          <div className="mb-4">
             <label htmlFor="user-password" className="form-field-lable">
               Password
             </label>
@@ -101,13 +97,12 @@ function SignIn() {
               type="password"
               minLength="6"
               id="user-password"
-              className={`form-input ${passwordError ? `border-red-500` : ''}`}
-              // required
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${passwordError ? `border-red-500` : ''}`}
+              required
               onChange={(evt) => {
                 setPasswordError('');
                 setPassword(evt.target.value);
-                }
-              }
+              }}
             />
             {passwordError && (
               <div className="text-red-500">{passwordError}</div>
@@ -116,7 +111,7 @@ function SignIn() {
 
           <button
             type="submit"
-            className="form-btn"
+            className="cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100"
             disabled={requestInProgress}
           >
             Sign in
