@@ -49,11 +49,11 @@ function SignIn() {
           password: password,
         },
       });
-      localStorage.setItem('authorization', `${resp.headers.authorization}`);
+      localStorage.setItem('authorization', resp.headers.authorization);
       setUser(resp.data);
       navigate('/');
     } catch (error) {
-      console.error(error.response?.data?.error);
+      console.error(error);
       if (error.response?.data?.error) {
         setGenericError(error.response?.data?.error);
       } else {
