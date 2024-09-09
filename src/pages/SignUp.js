@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import './SignUp.css';
 import { todoAPI } from '../api/todoAPI';
 import UserContext from '../contexts/UserContext';
 
@@ -120,18 +119,21 @@ function SignUp() {
   };
 
   return (
-    <div className="sign-up__page">
-      <section className="sign-up">
-        <h2 className="sign-up-page-name">Create account</h2>
-        <form className="sign-up-form" onSubmit={handleSubmit}>
-          <div className="form-field">
+    <div className="m-auto h-96 w-80">
+      <section className="box-border flex w-full flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold">Create account</h2>
+        <form
+          className="box-border rounded-2xl border-2 border-solid border-blue-900 pb-4 pl-16 pr-16 pt-8 text-center"
+          onSubmit={handleSubmit}
+        >
+          <div className="mb-4">
             <label htmlFor="user-email" className="form-field-lable">
               Email
             </label>
             <input
               type="email"
               id="user-email"
-              className={`form-input ${emailError ? `border-red-500` : ''}`}
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${emailError ? `border-red-500` : ''}`}
               required
               onChange={(evt) => {
                 setEmailError('');
@@ -141,14 +143,14 @@ function SignUp() {
             {emailError && <div className="text-red-500">{emailError}</div>}
           </div>
 
-          <div className="form-field">
+          <div className="mb-4">
             <label htmlFor="user-name" className="form-field-lable">
               Name
             </label>
             <input
               type="text"
               id="user-name"
-              className={`form-input ${nameError ? `border-red-500` : ''}`}
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${nameError ? `border-red-500` : ''}`}
               required
               onChange={(evt) => {
                 setNameError('');
@@ -158,14 +160,14 @@ function SignUp() {
             {nameError && <div className="text-red-500">{nameError}</div>}
           </div>
 
-          <div className="form-field">
+          <div className="mb-4">
             <label htmlFor="user-last-name" className="form-field-lable">
               Surname
             </label>
             <input
               type="text"
               id="user-last-name"
-              className={`form-input ${lastNameError ? `border-red-500` : ''}`}
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${lastNameError ? `border-red-500` : ''}`}
               required
               onChange={(evt) => {
                 setLastNameError('');
@@ -177,7 +179,7 @@ function SignUp() {
             )}
           </div>
 
-          <div className="form-field">
+          <div className="mb-4">
             <label htmlFor="user-password" className="form-field-lable">
               Password
             </label>
@@ -185,7 +187,7 @@ function SignUp() {
               type="password"
               minLength="6"
               id="user-password"
-              className={`form-input ${passwordError ? `border-red-500` : ''}`}
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${passwordError ? `border-red-500` : ''}`}
               required
               onChange={(evt) => {
                 setPasswordError('');
@@ -200,7 +202,7 @@ function SignUp() {
             )}
           </div>
 
-          <div className="form-field">
+          <div className="mb-4">
             <label htmlFor="user-confirm-password" className="form-field-lable">
               Confirm password
             </label>
@@ -208,7 +210,7 @@ function SignUp() {
               type="password"
               minLength="6"
               id="user-confirm-password"
-              className={`form-input ${passwordConfirmationError ? `border-red-500` : ''}`}
+              className={`box-border w-full rounded-lg border-2 border-solid border-blue-900 px-4 py-2 text-base font-medium text-black ${passwordConfirmationError ? `border-red-500` : ''}`}
               required
               onChange={(evt) => {
                 setConfirmPassword(evt.target.value);
@@ -224,7 +226,7 @@ function SignUp() {
 
           <button
             type="submit"
-            className="form-btn"
+            className="cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100"
             disabled={requestInProgress}
           >
             Sign up
