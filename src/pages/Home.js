@@ -6,6 +6,7 @@ import { todoAPI } from '../api/todoAPI';
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const [requestInProgress, setRequestInProgress] = useState(false);
+
   const handleClick = async () =>  {
 
     setRequestInProgress(true);
