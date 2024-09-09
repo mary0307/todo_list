@@ -7,8 +7,7 @@ function Home() {
   const { user, setUser } = useContext(UserContext);
   const [requestInProgress, setRequestInProgress] = useState(false);
 
-  const handleClick = async () =>  {
-
+  const handleClick = async () => {
     setRequestInProgress(true);
 
     try {
@@ -29,7 +28,7 @@ function Home() {
 
   return (
     <>
-      {user &&
+      {user && (
         <>
           <p>{user?.name}</p>
           <button
@@ -41,7 +40,7 @@ function Home() {
             Sign out
           </button>
         </>
-      }
+      )}
     </>
   );
 }
