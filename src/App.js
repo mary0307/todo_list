@@ -36,25 +36,25 @@ function App() {
 
     if (!localStorage.getItem('authorization')) {
       window.location.href = '/signup';
-    } else {
-      todoAPI
-        .get('/me', {
-          headers: {
-            authorization: localStorage.getItem('authorization'),
-          },
-        })
-        .then((resp) => {
-          setUser(resp.data);
-        })
-        .catch((err) => {
-          if (window.location.pathname === '/signin') {
-            return;
-          }
-
-          console.error(err);
-          alert('Reload the page');
-        });
+      return;
     }
+
+    todoAPI
+      .get('/me', {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      })
+      .then((resp) => {
+        setUser(resp.data);
+      })
+      .catch((err) => {
+        if (window.location.pathname === '/signin') {
+          return;
+        }
+
+        console.error(err);
+      });
   }, [user]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import UserContext from '../contexts/UserContext';
 import { todoAPI } from '../api/todoAPI';
@@ -6,6 +6,7 @@ import { todoAPI } from '../api/todoAPI';
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const [requestInProgress, setRequestInProgress] = useState(false);
+  const [tasks, setTasks] = useState([]);
 
   const handleClick = async () => {
     setRequestInProgress(true);
@@ -26,6 +27,35 @@ function Home() {
     setRequestInProgress(false);
   };
 
+  const loadTasks = async () => {
+    if (!user) {
+      return;
+    }
+
+    if (tasks.length) {
+      return;
+    }
+
+    try {
+      const resp = await todoAPI.get('/tasks', {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      });
+
+      setTasks(resp.data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const loadTasksSync = () => {
+    loadTasks();
+  };
+
+  useEffect(loadTasksSync, [user]);
+
   return (
     <>
       {user && (
@@ -39,6 +69,11 @@ function Home() {
           >
             Sign out
           </button>
+          {tasks.map((task) => (
+            <p key={task.id}>
+              {task.text}
+            </p>
+          ))}
         </>
       )}
     </>
