@@ -5,11 +5,12 @@ import { todoAPI } from '../api/todoAPI';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
-  const [requestInProgress, setRequestInProgress] = useState(false);
+  const [logOutRequestInProgress, setLogOutRequestInProgress] = useState(false);
+  const [deleteRequestInProgress, setDeleteRequestInProgress] = useState(false);
   const [tasks, setTasks] = useState([]);
 
-  const handleClick = async () => {
-    setRequestInProgress(true);
+  const handleLogOut = async () => {
+    setLogOutRequestInProgress(true);
 
     try {
       await todoAPI.delete('/users/sign_out', {
@@ -24,15 +25,38 @@ function Home() {
       alert('Unexpected error, please try again later');
     }
 
-    setRequestInProgress(false);
+    setLogOutRequestInProgress(false);
   };
 
-  const loadTasks = async () => {
+  const handleDelete = async (id) => {
+    setDeleteRequestInProgress(true);
+    try {
+      await todoAPI
+        .delete(`/task/${id}`, {
+          headers: {
+            authorization: localStorage.getItem('authorization'),
+          },
+        });
+      loadTasks(true);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        loadTasks(true);
+        return;
+      }
+
+      console.error(error);
+      alert('Unexpected error, please try again later');
+    }
+
+    setDeleteRequestInProgress(false);
+  }
+
+  const loadTasks = async (force) => {
     if (!user) {
       return;
     }
 
-    if (tasks.length) {
+    if (!force && tasks.length) {
       return;
     }
 
@@ -63,16 +87,26 @@ function Home() {
           <p>{user?.name}</p>
           <button
             type="button"
-            onClick={handleClick}
+            onClick={handleLogOut}
             className="cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100"
-            disabled={requestInProgress}
+            disabled={logOutRequestInProgress}
           >
             Sign out
           </button>
           {tasks.map((task) => (
-            <p key={task.id}>
-              {task.text}
-            </p>
+            <div key={task.id} className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => { handleDelete(task.id); }}
+                className="bg-amber-700"
+                disabled={deleteRequestInProgress}
+              >
+                Delete
+              </button>
+              <p>
+                {task.text}
+              </p>
+            </div>
           ))}
         </>
       )}
