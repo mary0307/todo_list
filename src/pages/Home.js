@@ -28,11 +28,34 @@ function Home() {
     setLogOutRequestInProgress(false);
   };
 
-  const handleDelete = async (id) => {
+  const handleTaskDelete = async (id) => {
     setDeleteRequestInProgress(true);
     try {
       await todoAPI
         .delete(`/task/${id}`, {
+          headers: {
+            authorization: localStorage.getItem('authorization'),
+          },
+        });
+      loadTasks(true);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        loadTasks(true);
+        return;
+      }
+
+      console.error(error);
+      alert('Unexpected error, please try again later');
+    }
+
+    setDeleteRequestInProgress(false);
+  }
+
+  const handleDeleteComment = async (id, taskId) => {
+    setDeleteRequestInProgress(true);
+    try {
+      await todoAPI
+        .delete(`/tasks/${taskId}/comments/${id}`, {
           headers: {
             authorization: localStorage.getItem('authorization'),
           },
@@ -94,22 +117,46 @@ function Home() {
             Sign out
           </button>
           {tasks.map((task) => (
-            <div key={task.id} className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => { handleDelete(task.id); }}
-                className="bg-amber-700"
-                disabled={deleteRequestInProgress}
-              >
-                Delete
-              </button>
-              <p>
-                {task.text}
-              </p>
+            <div key={`task-${task.id}`}>
+              <div className='flex gap-4'>
+                <button
+                  type='button'
+                  onClick={() => {
+                    handleTaskDelete(task.id);
+                  }}
+                  className='bg-orange-600'
+                  disabled={deleteRequestInProgress}
+                >
+                  Delete
+                </button>
+                <p>
+                  {task.text}
+                </p>
+              </div>
+              {task.comments.map((comment) => (
+                <div key={`comment-${comment.id}`} className="flex gap-4 ml-8">
+                  <button
+                    type="button"
+                    onClick={() => { handleDeleteComment(comment.id, task.id); }}
+                    className="bg-amber-300"
+                    disabled={deleteRequestInProgress}
+                  >
+                    Delete
+                  </button>
+                  <p>
+                    {comment.text}
+                  </p>
+                </div>
+              ))}
             </div>
           ))}
         </>
       )}
+      {Object.keys(user).map((prop) => (
+        <p key={prop}>
+          {prop}: {user[prop]}
+        </p>
+      ))}
     </>
   );
 }
