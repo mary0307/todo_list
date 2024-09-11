@@ -6,8 +6,10 @@ import { todoAPI } from '../api/todoAPI';
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const [logOutRequestInProgress, setLogOutRequestInProgress] = useState(false);
-  const [taskDeleteRequestInProgress, setTaskDeleteRequestInProgress] = useState(false);
-  const [commentDeleteRequestInProgress, setCommentDeleteRequestInProgress] = useState(false);
+  const [taskDeleteRequestInProgress, setTaskDeleteRequestInProgress] =
+    useState(false);
+  const [commentDeleteRequestInProgress, setCommentDeleteRequestInProgress] =
+    useState(false);
   const [tasks, setTasks] = useState([]);
 
   const handleLogOut = async () => {
@@ -148,11 +150,12 @@ function Home() {
           ))}
         </>
       )}
-      {user && Object.keys(user).map((prop) => (
-        <p key={prop}>
-          {prop}: {user[prop]}
-        </p>
-      ))}
+      {user &&
+        Object.keys(user).map((prop) => (
+          <p key={prop}>
+            {prop}: {user[prop]}
+          </p>
+        ))}
     </>
   );
 }
