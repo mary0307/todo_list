@@ -148,7 +148,7 @@ function Home() {
           ))}
         </>
       )}
-      {Object.keys(user).map((prop) => (
+      {user && Object.keys(user).map((prop) => (
         <p key={prop}>
           {prop}: {user[prop]}
         </p>
