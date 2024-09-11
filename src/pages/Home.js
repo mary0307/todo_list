@@ -6,7 +6,8 @@ import { todoAPI } from '../api/todoAPI';
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const [logOutRequestInProgress, setLogOutRequestInProgress] = useState(false);
-  const [deleteRequestInProgress, setDeleteRequestInProgress] = useState(false);
+  const [taskDeleteRequestInProgress, setTaskDeleteRequestInProgress] = useState(false);
+  const [commentDeleteRequestInProgress, setCommentDeleteRequestInProgress] = useState(false);
   const [tasks, setTasks] = useState([]);
 
   const handleLogOut = async () => {
@@ -29,7 +30,7 @@ function Home() {
   };
 
   const handleTaskDelete = async (id) => {
-    setDeleteRequestInProgress(true);
+    setTaskDeleteRequestInProgress(true);
     try {
       await todoAPI.delete(`/task/${id}`, {
         headers: {
@@ -47,11 +48,11 @@ function Home() {
       alert('Unexpected error, please try again later');
     }
 
-    setDeleteRequestInProgress(false);
+    setTaskDeleteRequestInProgress(false);
   };
 
-  const handleDeleteComment = async (id, taskId) => {
-    setDeleteRequestInProgress(true);
+  const handleCommentDelete = async (id, taskId) => {
+    setCommentDeleteRequestInProgress(true);
     try {
       await todoAPI.delete(`/tasks/${taskId}/comments/${id}`, {
         headers: {
@@ -69,7 +70,7 @@ function Home() {
       alert('Unexpected error, please try again later');
     }
 
-    setDeleteRequestInProgress(false);
+    setCommentDeleteRequestInProgress(false);
   };
 
   const loadTasks = async (force) => {
@@ -122,7 +123,7 @@ function Home() {
                     handleTaskDelete(task.id);
                   }}
                   className="bg-orange-600"
-                  disabled={deleteRequestInProgress}
+                  disabled={taskDeleteRequestInProgress}
                 >
                   Delete
                 </button>
@@ -133,10 +134,10 @@ function Home() {
                   <button
                     type="button"
                     onClick={() => {
-                      handleDeleteComment(comment.id, task.id);
+                      handleCommentDelete(comment.id, task.id);
                     }}
                     className="bg-amber-300"
-                    disabled={deleteRequestInProgress}
+                    disabled={commentDeleteRequestInProgress}
                   >
                     Delete
                   </button>
