@@ -31,12 +31,11 @@ function Home() {
   const handleTaskDelete = async (id) => {
     setDeleteRequestInProgress(true);
     try {
-      await todoAPI
-        .delete(`/task/${id}`, {
-          headers: {
-            authorization: localStorage.getItem('authorization'),
-          },
-        });
+      await todoAPI.delete(`/task/${id}`, {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      });
       loadTasks(true);
     } catch (error) {
       if (error.response?.status === 404) {
@@ -49,17 +48,16 @@ function Home() {
     }
 
     setDeleteRequestInProgress(false);
-  }
+  };
 
   const handleDeleteComment = async (id, taskId) => {
     setDeleteRequestInProgress(true);
     try {
-      await todoAPI
-        .delete(`/tasks/${taskId}/comments/${id}`, {
-          headers: {
-            authorization: localStorage.getItem('authorization'),
-          },
-        });
+      await todoAPI.delete(`/tasks/${taskId}/comments/${id}`, {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      });
       loadTasks(true);
     } catch (error) {
       if (error.response?.status === 404) {
@@ -72,7 +70,7 @@ function Home() {
     }
 
     setDeleteRequestInProgress(false);
-  }
+  };
 
   const loadTasks = async (force) => {
     if (!user) {
@@ -91,7 +89,6 @@ function Home() {
       });
 
       setTasks(resp.data);
-
     } catch (error) {
       console.error(error);
     }
@@ -118,34 +115,32 @@ function Home() {
           </button>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
-              <div className='flex gap-4'>
+              <div className="flex gap-4">
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     handleTaskDelete(task.id);
                   }}
-                  className='bg-orange-600'
+                  className="bg-orange-600"
                   disabled={deleteRequestInProgress}
                 >
                   Delete
                 </button>
-                <p>
-                  {task.text}
-                </p>
+                <p>{task.text}</p>
               </div>
               {task.comments.map((comment) => (
-                <div key={`comment-${comment.id}`} className="flex gap-4 ml-8">
+                <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
                   <button
                     type="button"
-                    onClick={() => { handleDeleteComment(comment.id, task.id); }}
+                    onClick={() => {
+                      handleDeleteComment(comment.id, task.id);
+                    }}
                     className="bg-amber-300"
                     disabled={deleteRequestInProgress}
                   >
                     Delete
                   </button>
-                  <p>
-                    {comment.text}
-                  </p>
+                  <p>{comment.text}</p>
                 </div>
               ))}
             </div>
