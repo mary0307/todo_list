@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import UserContext from '../contexts/UserContext';
 import { todoAPI } from '../api/todoAPI';
+import { patch } from 'axios';
+import * as task from 'react-dom/test-utils';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -103,6 +105,23 @@ function Home() {
 
   useEffect(loadTasksSync, [user]);
 
+  const updateTask = async (task, params) => {
+    try {
+      const resp = await todoAPI.patch(`/tasks/${task.id}`, params, {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      });
+      const otherTasks = tasks.filter((el) => el.id !== task.id);
+      setTasks([resp.data, ...otherTasks].sort((a, b) => a.id - b.id));
+    } catch (error) {
+      task.error =
+        error.response?.data?.errors?.text ||
+        'Unexpected error, please try again later';
+      console.error(error);
+    }
+  };
+
   return (
     <>
       {user && (
@@ -129,7 +148,46 @@ function Home() {
                 >
                   Delete
                 </button>
-                <p>{task.text}</p>
+                {task.editMode ? (
+                  <>
+                    <input
+                      id={`task-${task.id}`}
+                      className="border-2 border-r-amber-400"
+                      type="text"
+                      value={task.text}
+                      onChange={(evt) => {
+                        const otherTasks = tasks.filter(
+                          (el) => el.id !== task.id,
+                        );
+                        task.text = evt.target.value;
+                        setTasks(
+                          [task, ...otherTasks].sort((a, b) => a.id - b.id),
+                        );
+                      }}
+                      onBlur={(evt) => {
+                        updateTask(task, { text: evt.target.value });
+                      }}
+                    />
+                    {task.error && <p>{task.error}</p>}
+                  </>
+                ) : (
+                  <p
+                    onClick={() => {
+                      const otherTasks = tasks.filter(
+                        (el) => el.id !== task.id,
+                      );
+                      task.editMode = true;
+                      setTasks(
+                        [task, ...otherTasks].sort((a, b) => a.id - b.id),
+                      );
+                      setTimeout(() => {
+                        document.getElementById(`task-${task.id}`).focus();
+                      }, 100);
+                    }}
+                  >
+                    {task.text} {task.status}
+                  </p>
+                )}
               </div>
               {task.comments.map((comment) => (
                 <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
