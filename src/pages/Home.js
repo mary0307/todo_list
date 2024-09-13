@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import UserContext from '../contexts/UserContext';
 import { todoAPI } from '../api/todoAPI';
-import { patch } from 'axios';
-import * as task from 'react-dom/test-utils';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -13,6 +11,10 @@ function Home() {
   const [commentDeleteRequestInProgress, setCommentDeleteRequestInProgress] =
     useState(false);
   const [tasks, setTasks] = useState([]);
+  const [taskEditError, setTaskEditError] = useState('');
+  const [commentEditError, setCommentEditError] = useState('');
+
+  const [editingCommentId, setEditingCommentId] = useState(undefined);
 
   const handleLogOut = async () => {
     setLogOutRequestInProgress(true);
@@ -103,6 +105,7 @@ function Home() {
     loadTasks();
   };
 
+
   useEffect(loadTasksSync, [user]);
 
   const updateTask = async (task, params) => {
@@ -114,19 +117,49 @@ function Home() {
       });
       const otherTasks = tasks.filter((el) => el.id !== task.id);
       setTasks([resp.data, ...otherTasks].sort((a, b) => a.id - b.id));
+      setTaskEditError('');
     } catch (error) {
-      task.error =
+      setTaskEditError(
         error.response?.data?.errors?.text ||
-        'Unexpected error, please try again later';
+          'Unexpected error, please try again later',
+      );
+      console.error(error);
+    }
+  };
+
+  const updateComment = async (comment, params) => {
+    if (comment.text === params.text) {
+      setEditingCommentId(undefined);
+      return;
+    }
+
+    try {
+      await todoAPI.patch(
+        `/tasks/${comment.task_id}/comments/${comment.id}`,
+        params,
+        {
+          headers: {
+            authorization: localStorage.getItem('authorization'),
+          },
+        },
+      );
+      loadTasks(true);
+      setEditingCommentId(undefined);
+      setCommentEditError('');
+    } catch (error) {
+      setCommentEditError(
+        error.response?.data?.errors?.text ||
+          'Unexpected error, please try again later',
+      );
       console.error(error);
     }
   };
 
   return (
     <>
-      {user && (
+      {user ? (
         <>
-          <p>{user?.name}</p>
+          <p>{user.name}</p>
           <button
             type="button"
             onClick={handleLogOut}
@@ -137,13 +170,13 @@ function Home() {
           </button>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
-              <div className="flex gap-4">
+              <div className='flex gap-4'>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     handleTaskDelete(task.id);
                   }}
-                  className="bg-orange-600"
+                  className='bg-orange-600'
                   disabled={taskDeleteRequestInProgress}
                 >
                   Delete
@@ -152,33 +185,33 @@ function Home() {
                   <>
                     <input
                       id={`task-${task.id}`}
-                      className="border-2 border-r-amber-400"
-                      type="text"
+                      className='border-2 border-r-amber-400'
+                      type='text'
                       value={task.text}
                       onChange={(evt) => {
                         const otherTasks = tasks.filter(
-                          (el) => el.id !== task.id,
+                          (el) => el.id !== task.id
                         );
                         task.text = evt.target.value;
                         setTasks(
-                          [task, ...otherTasks].sort((a, b) => a.id - b.id),
+                          [task, ...otherTasks].sort((a, b) => a.id - b.id)
                         );
                       }}
                       onBlur={(evt) => {
                         updateTask(task, { text: evt.target.value });
                       }}
                     />
-                    {task.error && <p>{task.error}</p>}
+                    {taskEditError && <p>{taskEditError}</p>}
                   </>
                 ) : (
                   <p
                     onClick={() => {
                       const otherTasks = tasks.filter(
-                        (el) => el.id !== task.id,
+                        (el) => el.id !== task.id
                       );
                       task.editMode = true;
                       setTasks(
-                        [task, ...otherTasks].sort((a, b) => a.id - b.id),
+                        [task, ...otherTasks].sort((a, b) => a.id - b.id)
                       );
                       setTimeout(() => {
                         document.getElementById(`task-${task.id}`).focus();
@@ -188,11 +221,18 @@ function Home() {
                     {task.text} {task.status}
                   </p>
                 )}
+                <input
+                  className='border-2 border-b-emerald-900'
+                  type='checkbox'
+                  // onChange={() => {
+                  //   updateStatus();
+                  // }}
+                />
               </div>
               {task.comments.map((comment) => (
-                <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
+                <div key={`comment-${comment.id}`} className='ml-8 flex gap-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       handleCommentDelete(comment.id, task.id);
                     }}
@@ -201,12 +241,41 @@ function Home() {
                   >
                     Delete
                   </button>
-                  <p>{comment.text}</p>
+                  {comment.id === editingCommentId ? (
+                    <>
+                      <input
+                        id={`comment-${comment.id}`}
+                        className="border-2 border-r-amber-400"
+                        type="text"
+                        onBlur={(evt) => {
+                          updateComment(comment, { text: evt.target.value });
+                        }}
+                      />
+                      {commentEditError && <p>{commentEditError}</p>}
+                    </>
+                  ) : (
+                    <p
+                      onClick={() => {
+                        setEditingCommentId(comment.id);
+                        setTimeout(() => {
+                          const input = document.getElementById(
+                            `comment-${comment.id}`,
+                          );
+                          input.value = comment.text;
+                          input.focus();
+                        }, 100);
+                      }}
+                    >
+                      {comment.text}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           ))}
         </>
+      ) : (
+        <a href="/signin">Sign in</a>
       )}
       {user &&
         Object.keys(user).map((prop) => (
