@@ -105,7 +105,6 @@ function Home() {
     loadTasks();
   };
 
-
   useEffect(loadTasksSync, [user]);
 
   const updateTask = async (task, params) => {
@@ -170,13 +169,13 @@ function Home() {
           </button>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
-              <div className='flex gap-4'>
+              <div className="flex gap-4">
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     handleTaskDelete(task.id);
                   }}
-                  className='bg-orange-600'
+                  className="bg-orange-600"
                   disabled={taskDeleteRequestInProgress}
                 >
                   Delete
@@ -185,16 +184,16 @@ function Home() {
                   <>
                     <input
                       id={`task-${task.id}`}
-                      className='border-2 border-r-amber-400'
-                      type='text'
+                      className="border-2 border-r-amber-400"
+                      type="text"
                       value={task.text}
                       onChange={(evt) => {
                         const otherTasks = tasks.filter(
-                          (el) => el.id !== task.id
+                          (el) => el.id !== task.id,
                         );
                         task.text = evt.target.value;
                         setTasks(
-                          [task, ...otherTasks].sort((a, b) => a.id - b.id)
+                          [task, ...otherTasks].sort((a, b) => a.id - b.id),
                         );
                       }}
                       onBlur={(evt) => {
@@ -205,34 +204,38 @@ function Home() {
                   </>
                 ) : (
                   <p
+                    className={task.status === 'done' ? 'line-through' : ''}
                     onClick={() => {
                       const otherTasks = tasks.filter(
-                        (el) => el.id !== task.id
+                        (el) => el.id !== task.id,
                       );
                       task.editMode = true;
                       setTasks(
-                        [task, ...otherTasks].sort((a, b) => a.id - b.id)
+                        [task, ...otherTasks].sort((a, b) => a.id - b.id),
                       );
                       setTimeout(() => {
                         document.getElementById(`task-${task.id}`).focus();
                       }, 100);
                     }}
                   >
-                    {task.text} {task.status}
+                    {task.text}
                   </p>
                 )}
                 <input
-                  className='border-2 border-b-emerald-900'
-                  type='checkbox'
-                  // onChange={() => {
-                  //   updateStatus();
-                  // }}
+                  className="border-2 border-b-emerald-900"
+                  type="checkbox"
+                  checked={task.status === 'done'}
+                  onChange={(evt) => {
+                    updateTask(task, {
+                      status: evt.target.checked ? 'done' : 'todo',
+                    });
+                  }}
                 />
               </div>
               {task.comments.map((comment) => (
-                <div key={`comment-${comment.id}`} className='ml-8 flex gap-4'>
+                <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
                   <button
-                    type='button'
+                    type="button"
                     onClick={() => {
                       handleCommentDelete(comment.id, task.id);
                     }}
