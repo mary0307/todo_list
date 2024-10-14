@@ -167,6 +167,9 @@ function Home() {
           >
             Sign out
           </button>
+          <p>
+            Tasks: {tasks.length}
+          </p>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
               <div className="flex gap-4">
