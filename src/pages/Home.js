@@ -14,6 +14,7 @@ function Home() {
   const [taskEditError, setTaskEditError] = useState('');
   const [commentEditError, setCommentEditError] = useState('');
 
+  const [editingTaskId, setEditingTaskId] = useState(undefined);
   const [editingCommentId, setEditingCommentId] = useState(undefined);
 
   const handleLogOut = async () => {
@@ -189,7 +190,7 @@ function Home() {
                 >
                   Delete
                 </button>
-                {task.editMode ? (
+                {task.id === editingTaskId ? (
                   <>
                     <input
                       id={`task-${task.id}`}
@@ -206,7 +207,13 @@ function Home() {
                         );
                       }}
                       onBlur={(evt) => {
+                        setEditingTaskId(null);
                         updateTask(task, { text: evt.target.value });
+                      }}
+                      onKeyDown={(evt) => {
+                        if (evt.key === 'Enter') {
+                          evt.target.blur();
+                        }
                       }}
                     />
                     {taskEditError && <p>{taskEditError}</p>}
@@ -215,15 +222,20 @@ function Home() {
                   <p
                     className={task.status === 'done' ? 'line-through' : ''}
                     onClick={() => {
-                      const otherTasks = tasks.filter(
-                        (el) => el.id !== task.id
-                      );
-                      task.editMode = true;
-                      setTasks(
-                        [task, ...otherTasks].sort((a, b) => a.id - b.id)
-                      );
+                      setEditingTaskId(task.id);
+                      // const otherTasks = tasks.filter(
+                      //   (el) => el.id !== task.id
+                      // );
+                      // task.editMode = true;
+                      // setTasks(
+                      //   [task, ...otherTasks].sort((a, b) => a.id - b.id)
+                      // );
                       setTimeout(() => {
-                        document.getElementById(`task-${task.id}`).focus();
+                        const input = document.getElementById(
+                          `task-${task.id}`
+                        );
+                        input.value = task.text;
+                        input.focus();
                       }, 100);
                     }}
                   >
@@ -261,6 +273,11 @@ function Home() {
                         type='text'
                         onBlur={(evt) => {
                           updateComment(comment, { text: evt.target.value });
+                        }}
+                        onKeyDown={(evt) => {
+                          if (evt.key === 'Enter') {
+                            evt.target.blur();
+                          }
                         }}
                       />
                       {commentEditError && <p>{commentEditError}</p>}
