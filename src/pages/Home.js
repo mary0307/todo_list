@@ -117,6 +117,7 @@ function Home() {
       });
       const otherTasks = tasks.filter((el) => el.id !== task.id);
       setTasks([resp.data, ...otherTasks].sort((a, b) => a.id - b.id));
+      setEditingTaskId(undefined);
       setTaskEditError('');
     } catch (error) {
       setTaskEditError(
@@ -207,7 +208,6 @@ function Home() {
                         );
                       }}
                       onBlur={(evt) => {
-                        setEditingTaskId(null);
                         updateTask(task, { text: evt.target.value });
                       }}
                       onKeyDown={(evt) => {
