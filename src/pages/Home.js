@@ -198,15 +198,6 @@ function Home() {
                       className="border-2 border-r-amber-400"
                       type="text"
                       value={task.text}
-                      onChange={(evt) => {
-                        const otherTasks = tasks.filter(
-                          (el) => el.id !== task.id,
-                        );
-                        task.text = evt.target.value;
-                        setTasks(
-                          [task, ...otherTasks].sort((a, b) => a.id - b.id),
-                        );
-                      }}
                       onBlur={(evt) => {
                         updateTask(task, { text: evt.target.value });
                       }}
@@ -223,13 +214,6 @@ function Home() {
                     className={task.status === 'done' ? 'line-through' : ''}
                     onClick={() => {
                       setEditingTaskId(task.id);
-                      // const otherTasks = tasks.filter(
-                      //   (el) => el.id !== task.id
-                      // );
-                      // task.editMode = true;
-                      // setTasks(
-                      //   [task, ...otherTasks].sort((a, b) => a.id - b.id)
-                      // );
                       setTimeout(() => {
                         const input = document.getElementById(
                           `task-${task.id}`,
