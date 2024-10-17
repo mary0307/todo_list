@@ -11,6 +11,11 @@ function Home() {
   const [commentDeleteRequestInProgress, setCommentDeleteRequestInProgress] =
     useState(false);
   const [tasks, setTasks] = useState([]);
+  const [taskEditError, setTaskEditError] = useState('');
+  const [commentEditError, setCommentEditError] = useState('');
+
+  const [editingTaskId, setEditingTaskId] = useState(undefined);
+  const [editingCommentId, setEditingCommentId] = useState(undefined);
 
   const handleLogOut = async () => {
     setLogOutRequestInProgress(true);
@@ -103,11 +108,58 @@ function Home() {
 
   useEffect(loadTasksSync, [user]);
 
+  const updateTask = async (task, params) => {
+    try {
+      await todoAPI.patch(`/tasks/${task.id}`, params, {
+        headers: {
+          authorization: localStorage.getItem('authorization'),
+        },
+      });
+      loadTasks(true);
+      setEditingTaskId(undefined);
+      setTaskEditError('');
+    } catch (error) {
+      setTaskEditError(
+        error.response?.data?.errors?.text ||
+          'Unexpected error, please try again later',
+      );
+      console.error(error);
+    }
+  };
+
+  const updateComment = async (comment, params) => {
+    if (comment.text === params.text) {
+      setEditingCommentId(undefined);
+      return;
+    }
+
+    try {
+      await todoAPI.patch(
+        `/tasks/${comment.task_id}/comments/${comment.id}`,
+        params,
+        {
+          headers: {
+            authorization: localStorage.getItem('authorization'),
+          },
+        },
+      );
+      loadTasks(true);
+      setEditingCommentId(undefined);
+      setCommentEditError('');
+    } catch (error) {
+      setCommentEditError(
+        error.response?.data?.errors?.text ||
+          'Unexpected error, please try again later',
+      );
+      console.error(error);
+    }
+  };
+
   return (
     <>
-      {user && (
+      {user ? (
         <>
-          <p>{user?.name}</p>
+          <p>{user.name}</p>
           <button
             type="button"
             onClick={handleLogOut}
@@ -116,6 +168,15 @@ function Home() {
           >
             Sign out
           </button>
+          <p>Tasks: {tasks.length}</p>
+          <p>
+            Active tasks:{' '}
+            {tasks.filter((task) => task.status === 'todo').length}
+          </p>
+          <p>
+            Completed tasks:{' '}
+            {tasks.filter((task) => task.status === 'done').length}
+          </p>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
               <div className="flex gap-4">
@@ -129,7 +190,50 @@ function Home() {
                 >
                   Delete
                 </button>
-                <p>{task.text}</p>
+                {task.id === editingTaskId ? (
+                  <>
+                    <input
+                      id={`task-${task.id}`}
+                      className="border-2 border-r-amber-400"
+                      type="text"
+                      onBlur={(evt) => {
+                        updateTask(task, { text: evt.target.value });
+                      }}
+                      onKeyDown={(evt) => {
+                        if (evt.key === 'Enter') {
+                          evt.target.blur();
+                        }
+                      }}
+                    />
+                    {taskEditError && <p>{taskEditError}</p>}
+                  </>
+                ) : (
+                  <p
+                    className={task.status === 'done' ? 'line-through' : ''}
+                    onClick={() => {
+                      setEditingTaskId(task.id);
+                      setTimeout(() => {
+                        const input = document.getElementById(
+                          `task-${task.id}`,
+                        );
+                        input.value = task.text;
+                        input.focus();
+                      }, 100);
+                    }}
+                  >
+                    {task.text}
+                  </p>
+                )}
+                <input
+                  className="border-2 border-b-emerald-900"
+                  type="checkbox"
+                  checked={task.status === 'done'}
+                  onChange={(evt) => {
+                    updateTask(task, {
+                      status: evt.target.checked ? 'done' : 'todo',
+                    });
+                  }}
+                />
               </div>
               {task.comments.map((comment) => (
                 <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
@@ -143,12 +247,46 @@ function Home() {
                   >
                     Delete
                   </button>
-                  <p>{comment.text}</p>
+                  {comment.id === editingCommentId ? (
+                    <>
+                      <input
+                        id={`comment-${comment.id}`}
+                        className="border-2 border-r-amber-400"
+                        type="text"
+                        onBlur={(evt) => {
+                          updateComment(comment, { text: evt.target.value });
+                        }}
+                        onKeyDown={(evt) => {
+                          if (evt.key === 'Enter') {
+                            evt.target.blur();
+                          }
+                        }}
+                      />
+                      {commentEditError && <p>{commentEditError}</p>}
+                    </>
+                  ) : (
+                    <p
+                      onClick={() => {
+                        setEditingCommentId(comment.id);
+                        setTimeout(() => {
+                          const input = document.getElementById(
+                            `comment-${comment.id}`,
+                          );
+                          input.value = comment.text;
+                          input.focus();
+                        }, 100);
+                      }}
+                    >
+                      {comment.text}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           ))}
         </>
+      ) : (
+        <a href="/signin">Sign in</a>
       )}
       {user &&
         Object.keys(user).map((prop) => (
