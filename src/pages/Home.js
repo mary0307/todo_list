@@ -110,13 +110,12 @@ function Home() {
 
   const updateTask = async (task, params) => {
     try {
-      const resp = await todoAPI.patch(`/tasks/${task.id}`, params, {
+      await todoAPI.patch(`/tasks/${task.id}`, params, {
         headers: {
           authorization: localStorage.getItem('authorization'),
         },
       });
-      const otherTasks = tasks.filter((el) => el.id !== task.id);
-      setTasks([resp.data, ...otherTasks].sort((a, b) => a.id - b.id));
+      loadTasks(true);
       setEditingTaskId(undefined);
       setTaskEditError('');
     } catch (error) {
@@ -197,7 +196,6 @@ function Home() {
                       id={`task-${task.id}`}
                       className="border-2 border-r-amber-400"
                       type="text"
-                      value={task.text}
                       onBlur={(evt) => {
                         updateTask(task, { text: evt.target.value });
                       }}
