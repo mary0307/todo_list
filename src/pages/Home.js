@@ -162,31 +162,31 @@ function Home() {
         <>
           <p>{user.name}</p>
           <button
-            type='button'
+            type="button"
             onClick={handleLogOut}
-            className='cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100'
+            className="cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100"
             disabled={logOutRequestInProgress}
           >
             Sign out
           </button>
+          <p>Tasks: {tasks.length}</p>
           <p>
-            Tasks: {tasks.length}
+            Active tasks:{' '}
+            {tasks.filter((task) => task.status === 'todo').length}
           </p>
           <p>
-            Active tasks: {tasks.filter((task) => task.status === 'todo').length}
-          </p>
-          <p>
-            Completed tasks: {tasks.filter((task) => task.status === 'done').length}
+            Completed tasks:{' '}
+            {tasks.filter((task) => task.status === 'done').length}
           </p>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
-              <div className='flex gap-4'>
+              <div className="flex gap-4">
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     handleTaskDelete(task.id);
                   }}
-                  className='bg-orange-600'
+                  className="bg-orange-600"
                   disabled={taskDeleteRequestInProgress}
                 >
                   Delete
@@ -195,16 +195,16 @@ function Home() {
                   <>
                     <input
                       id={`task-${task.id}`}
-                      className='border-2 border-r-amber-400'
-                      type='text'
+                      className="border-2 border-r-amber-400"
+                      type="text"
                       value={task.text}
                       onChange={(evt) => {
                         const otherTasks = tasks.filter(
-                          (el) => el.id !== task.id
+                          (el) => el.id !== task.id,
                         );
                         task.text = evt.target.value;
                         setTasks(
-                          [task, ...otherTasks].sort((a, b) => a.id - b.id)
+                          [task, ...otherTasks].sort((a, b) => a.id - b.id),
                         );
                       }}
                       onBlur={(evt) => {
@@ -232,7 +232,7 @@ function Home() {
                       // );
                       setTimeout(() => {
                         const input = document.getElementById(
-                          `task-${task.id}`
+                          `task-${task.id}`,
                         );
                         input.value = task.text;
                         input.focus();
@@ -243,24 +243,24 @@ function Home() {
                   </p>
                 )}
                 <input
-                  className='border-2 border-b-emerald-900'
-                  type='checkbox'
+                  className="border-2 border-b-emerald-900"
+                  type="checkbox"
                   checked={task.status === 'done'}
                   onChange={(evt) => {
                     updateTask(task, {
-                      status: evt.target.checked ? 'done' : 'todo'
+                      status: evt.target.checked ? 'done' : 'todo',
                     });
                   }}
                 />
               </div>
               {task.comments.map((comment) => (
-                <div key={`comment-${comment.id}`} className='ml-8 flex gap-4'>
+                <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
                   <button
-                    type='button'
+                    type="button"
                     onClick={() => {
                       handleCommentDelete(comment.id, task.id);
                     }}
-                    className='bg-amber-300'
+                    className="bg-amber-300"
                     disabled={commentDeleteRequestInProgress}
                   >
                     Delete
@@ -269,8 +269,8 @@ function Home() {
                     <>
                       <input
                         id={`comment-${comment.id}`}
-                        className='border-2 border-r-amber-400'
-                        type='text'
+                        className="border-2 border-r-amber-400"
+                        type="text"
                         onBlur={(evt) => {
                           updateComment(comment, { text: evt.target.value });
                         }}
@@ -288,7 +288,7 @@ function Home() {
                         setEditingCommentId(comment.id);
                         setTimeout(() => {
                           const input = document.getElementById(
-                            `comment-${comment.id}`
+                            `comment-${comment.id}`,
                           );
                           input.value = comment.text;
                           input.focus();
@@ -304,7 +304,7 @@ function Home() {
           ))}
         </>
       ) : (
-        <a href='/signin'>Sign in</a>
+        <a href="/signin">Sign in</a>
       )}
       {user &&
         Object.keys(user).map((prop) => (
