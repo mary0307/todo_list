@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import UserContext from '../contexts/UserContext';
 import { todoAPI } from '../api/todoAPI';
+import './Home.css';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -16,6 +17,7 @@ function Home() {
 
   const [editingTaskId, setEditingTaskId] = useState(undefined);
   const [editingCommentId, setEditingCommentId] = useState(undefined);
+  const [loading, setLoading] = useState(true);
 
   const handleLogOut = async () => {
     setLogOutRequestInProgress(true);
@@ -37,6 +39,7 @@ function Home() {
   };
 
   const handleTaskDelete = async (id) => {
+    setLoading(true);
     setTaskDeleteRequestInProgress(true);
     try {
       await todoAPI.delete(`/task/${id}`, {
@@ -51,6 +54,7 @@ function Home() {
         return;
       }
 
+      setLoading(false);
       console.error(error);
       alert('Unexpected error, please try again later');
     }
@@ -59,6 +63,7 @@ function Home() {
   };
 
   const handleCommentDelete = async (id, taskId) => {
+    setLoading(true);
     setCommentDeleteRequestInProgress(true);
     try {
       await todoAPI.delete(`/tasks/${taskId}/comments/${id}`, {
@@ -73,6 +78,7 @@ function Home() {
         return;
       }
 
+      setLoading(false);
       console.error(error);
       alert('Unexpected error, please try again later');
     }
@@ -99,6 +105,8 @@ function Home() {
       setTasks(resp.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +117,7 @@ function Home() {
   useEffect(loadTasksSync, [user]);
 
   const updateTask = async (task, params) => {
+    setLoading(true);
     try {
       await todoAPI.patch(`/tasks/${task.id}`, params, {
         headers: {
@@ -119,6 +128,7 @@ function Home() {
       setEditingTaskId(undefined);
       setTaskEditError('');
     } catch (error) {
+      setLoading(false);
       setTaskEditError(
         error.response?.data?.errors?.text ||
           'Unexpected error, please try again later',
@@ -133,6 +143,7 @@ function Home() {
       return;
     }
 
+    setLoading(true);
     try {
       await todoAPI.patch(
         `/tasks/${comment.task_id}/comments/${comment.id}`,
@@ -147,6 +158,7 @@ function Home() {
       setEditingCommentId(undefined);
       setCommentEditError('');
     } catch (error) {
+      setLoading(false);
       setCommentEditError(
         error.response?.data?.errors?.text ||
           'Unexpected error, please try again later',
@@ -157,13 +169,14 @@ function Home() {
 
   return (
     <>
+      {loading && <div className='loader'></div>}
       {user ? (
         <>
           <p>{user.name}</p>
           <button
-            type="button"
+            type='button'
             onClick={handleLogOut}
-            className="cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100"
+            className='cursor-pointer rounded-lg border-none bg-blue-900 px-4 py-3 text-base font-normal text-stone-100'
             disabled={logOutRequestInProgress}
           >
             Sign out
@@ -179,13 +192,13 @@ function Home() {
           </p>
           {tasks.map((task) => (
             <div key={`task-${task.id}`}>
-              <div className="flex gap-4">
+              <div className='flex gap-4'>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     handleTaskDelete(task.id);
                   }}
-                  className="bg-orange-600"
+                  className='bg-orange-600'
                   disabled={taskDeleteRequestInProgress}
                 >
                   Delete
@@ -194,8 +207,8 @@ function Home() {
                   <>
                     <input
                       id={`task-${task.id}`}
-                      className="border-2 border-r-amber-400"
-                      type="text"
+                      className='border-2 border-r-amber-400'
+                      type='text'
                       onBlur={(evt) => {
                         updateTask(task, { text: evt.target.value });
                       }}
@@ -214,7 +227,7 @@ function Home() {
                       setEditingTaskId(task.id);
                       setTimeout(() => {
                         const input = document.getElementById(
-                          `task-${task.id}`,
+                          `task-${task.id}`
                         );
                         input.value = task.text;
                         input.focus();
@@ -225,24 +238,24 @@ function Home() {
                   </p>
                 )}
                 <input
-                  className="border-2 border-b-emerald-900"
-                  type="checkbox"
+                  className='border-2 border-b-emerald-900'
+                  type='checkbox'
                   checked={task.status === 'done'}
                   onChange={(evt) => {
                     updateTask(task, {
-                      status: evt.target.checked ? 'done' : 'todo',
+                      status: evt.target.checked ? 'done' : 'todo'
                     });
                   }}
                 />
               </div>
               {task.comments.map((comment) => (
-                <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
+                <div key={`comment-${comment.id}`} className='ml-8 flex gap-4'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       handleCommentDelete(comment.id, task.id);
                     }}
-                    className="bg-amber-300"
+                    className='bg-amber-300'
                     disabled={commentDeleteRequestInProgress}
                   >
                     Delete
@@ -251,8 +264,8 @@ function Home() {
                     <>
                       <input
                         id={`comment-${comment.id}`}
-                        className="border-2 border-r-amber-400"
-                        type="text"
+                        className='border-2 border-r-amber-400'
+                        type='text'
                         onBlur={(evt) => {
                           updateComment(comment, { text: evt.target.value });
                         }}
@@ -270,7 +283,7 @@ function Home() {
                         setEditingCommentId(comment.id);
                         setTimeout(() => {
                           const input = document.getElementById(
-                            `comment-${comment.id}`,
+                            `comment-${comment.id}`
                           );
                           input.value = comment.text;
                           input.focus();
