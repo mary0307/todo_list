@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import UserContext from '../contexts/UserContext';
 import { todoAPI } from '../api/todoAPI';
+import './Home.css';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -16,6 +17,9 @@ function Home() {
 
   const [editingTaskId, setEditingTaskId] = useState(undefined);
   const [editingCommentId, setEditingCommentId] = useState(undefined);
+
+  const [taskLoadingId, setTaskLoadingId] = useState(null);
+  const [commentLoadingId, setCommentLoadingId] = useState(null);
 
   const handleLogOut = async () => {
     setLogOutRequestInProgress(true);
@@ -99,6 +103,9 @@ function Home() {
       setTasks(resp.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setTaskLoadingId(null);
+      setCommentLoadingId(null);
     }
   };
 
@@ -109,6 +116,7 @@ function Home() {
   useEffect(loadTasksSync, [user]);
 
   const updateTask = async (task, params) => {
+    setTaskLoadingId(task.id);
     try {
       await todoAPI.patch(`/tasks/${task.id}`, params, {
         headers: {
@@ -119,6 +127,7 @@ function Home() {
       setEditingTaskId(undefined);
       setTaskEditError('');
     } catch (error) {
+      // setLoading(false);
       setTaskEditError(
         error.response?.data?.errors?.text ||
           'Unexpected error, please try again later',
@@ -133,6 +142,7 @@ function Home() {
       return;
     }
 
+    setCommentLoadingId(comment.id);
     try {
       await todoAPI.patch(
         `/tasks/${comment.task_id}/comments/${comment.id}`,
@@ -234,6 +244,7 @@ function Home() {
                     });
                   }}
                 />
+                {taskLoadingId === task.id && <div className="loader"></div>}
               </div>
               {task.comments.map((comment) => (
                 <div key={`comment-${comment.id}`} className="ml-8 flex gap-4">
@@ -279,6 +290,9 @@ function Home() {
                     >
                       {comment.text}
                     </p>
+                  )}
+                  {commentLoadingId === comment.id && (
+                    <div className="loader"></div>
                   )}
                 </div>
               ))}
